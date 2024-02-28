@@ -1,0 +1,604 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage[a4paper, total={6.5in, 10in}]{geometry}
+%New colors defined below
+\definecolor{codegreen}{rgb}{0,0,0}
+\definecolor{codegray}{rgb}{0,0,0}
+\definecolor{codepurple}{rgb}{0,0,0}
+\definecolor{backcolour}{rgb}{1,1,1}
+
+%Code listing style named "mystyle"
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
+  keywordstyle=\color{codegreen},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2
+}
+
+%"mystyle" code listing set
+\lstset{style=mystyle}
+
+\title{Cheatsheet}
+\date{2023}
+\author{ICPC}
+\begin{document}
+
+\maketitle
+\begin{multicols}{2}\section{Graph}
+\subsection{bfs}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m;
+vector<int> adj[MAX_N], dist;
+
+void bfs(int s) {
+    dist.assign(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (q.size()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) {
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
+        }
+    }
+}
+\end{lstlisting}
+\subsection{dfs}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+const int MAX_N = 1e5 + 5;
+const ll MOD = 1e9 + 7;
+const ll INF = 1e9;
+
+int n, m, vis[MAX_N];
+vector<int> adj[MAX_N];
+
+void dfs(int u) {
+    vis[u] = 1;
+    for (int v : adj[u]) {
+        if (vis[v]) continue;
+        dfs(v);
+    }
+}
+\end{lstlisting}
+\subsection{flood fill}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m, visited[MAX_N][MAX_N];
+char grid[MAX_N][MAX_N];
+ 
+const int di[] = {1, 0, -1, 0};
+const int dj[] = {0, -1, 0, 1};
+ 
+bool valid(int i, int j) {
+    return i >= 0 && j >= 0 && i < n && j < m && grid[i][j] == '.';
+}
+ 
+void dfs(int i, int j) {
+    visited[i][j] = 1;
+    for (int k = 0; k < 4; k++) {
+        int ni = i + di[k], nj = j + dj[k];
+        if (valid(ni, nj) && !visited[ni][nj]) {
+            dfs(ni, nj);
+        }
+    }
+}
+\end{lstlisting}
+\subsection{Kruskal}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m, par[MAX_N];
+vector<array<int,3>> edges;
+ 
+int find(int u) {
+    return u == par[u] ? u : par[u] = find(par[u]);
+}
+ 
+void unite(int u, int v) {
+    par[find(u)] = find(v);
+}
+
+void kruskal() {
+    sort(edges.begin(), edges.end());
+    for (int i = 1; i <= n; i++) par[i] = i;
+
+    ll cnt = 0, cost = 0;
+    for (auto [w, u, v] : edges) {
+        u = find(u), v = find(v);
+        if (u != v) {
+            par[u] = v;
+            cost += w;
+            cnt++;
+        }
+    }
+    if (cnt == n - 1) cout << cost << "\n";
+    else cout << "IMPOSSIBLE\n";
+}
+
+\end{lstlisting}
+\subsection{Dijkstra}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m;
+vector<ar<int,2>> adj[MAX_N];
+vector<ll> dist;
+
+void dijkstra(int s) {
+    dist.assign(n + 1, LINF);
+    priority_queue<ar<ll,2>, vector<ar<ll,2>>, greater<ar<ll,2>>> pq;
+    dist[s] = 0; pq.push({0, s});
+    while (pq.size()) {
+        auto [d, u] = pq.top(); pq.pop();
+        if (d > dist[u]) continue;
+        for (auto [v, w] : adj[u]) {
+            if (dist[v] > dist[u] + w) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+        }
+    } 
+}
+
+\end{lstlisting}
+\subsection{Bellman-Ford}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m, par[MAX_N];
+vector<ar<ll,2>> adj[MAX_N];
+vector<ll> dist;
+
+void bellman_ford(int s) {
+    dist.assign(n + 1, LINF);
+    dist[s] = 0;
+    for (int i = 0; i < n - 1; i++) {
+        for (int u = 1; u <= n; u++) {
+            for (auto [v, w] : adj[u]) {
+                if (dist[u] + w < dist[v]) {
+                    par[v] = u;
+                    dist[v] = dist[u] + w;
+                }
+            }
+        }
+    }
+}
+
+void cycle_detect() {
+    int cycle = 0;
+    for (int u = 1; u <= n; u++) {
+        for (auto [v, w] : adj[u]) {
+            if (dist[u] + w < dist[v]) {
+                cycle = v; 
+                break;
+            }
+        }
+    }
+    if (!cycle) cout << "NO\n";
+    else {
+        cout << "YES\n";
+        // backtrack to print the cycle
+        for (int i = 0; i < n; i++) cycle = par[cycle];
+        vector<int> ans; ans.push_back(cycle);
+        for (int i = par[cycle]; i != cycle; i = par[i]) ans.push_back(i); 
+        ans.push_back(cycle);
+        reverse(ans.begin(), ans.end());
+        for (int x : ans) cout << x << " ";
+        cout << "\n";
+    }
+}
+\end{lstlisting}
+\subsection{Floyd Warshall}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m, par[MAX_N];
+vector<ar<ll,2>> adj[MAX_N];
+vector<ll> dist;
+
+void bellman_ford(int s) {
+    dist.assign(n + 1, LINF);
+    dist[s] = 0;
+    for (int i = 0; i < n - 1; i++) {
+        for (int u = 1; u <= n; u++) {
+            for (auto [v, w] : adj[u]) {
+                if (dist[u] + w < dist[v]) {
+                    par[v] = u;
+                    dist[v] = dist[u] + w;
+                }
+            }
+        }
+    }
+}
+
+void cycle_detect() {
+    int cycle = 0;
+    for (int u = 1; u <= n; u++) {
+        for (auto [v, w] : adj[u]) {
+            if (dist[u] + w < dist[v]) {
+                cycle = v; 
+                break;
+            }
+        }
+    }
+    if (!cycle) cout << "NO\n";
+    else {
+        cout << "YES\n";
+        // backtrack to print the cycle
+        for (int i = 0; i < n; i++) cycle = par[cycle];
+        vector<int> ans; ans.push_back(cycle);
+        for (int i = par[cycle]; i != cycle; i = par[i]) ans.push_back(i); 
+        ans.push_back(cycle);
+        reverse(ans.begin(), ans.end());
+        for (int x : ans) cout << x << " ";
+        cout << "\n";
+    }
+}
+\end{lstlisting}
+\subsection{Korasaju}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m, scc, visited[MAX_N];
+vector<int> adj[2][MAX_N], comp[MAX_N], dfn;
+// adj[0] is the original graph, adj[1] is the transposed graph
+
+// t = 0 means 1st pass, t = 1 means 2nd pass
+void dfs(int u, int t) {
+    visited[u] = 1;
+    if (t == 1) comp[scc].push_back(u);
+    for (int v : adj[t][u]) {
+        if (!visited[v]) {
+            dfs(v, t);
+        }
+    }
+    if (t == 0) dfn.push_back(u);
+}
+
+void kosaraju() {
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) {
+            dfs(i, 0);
+        }
+    }
+    memset(visited, 0, sizeof visited);
+    for (int i = n - 1; i >= 0; i--) {
+        if (!visited[dfn[i]]) {
+            scc++;
+            dfs(dfn[i], 1);
+        }
+    }
+}
+\end{lstlisting}
+\subsection{Tarjan}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, m, scc, dfsCounter;
+int dfs_num[MAX_N], dfs_low[MAX_N], visited[MAX_N];
+stack<int> st;
+vector<int> adj[MAX_N], comp[MAX_N];
+
+// Modified DFS
+void tarjan(int u) { 
+    dfs_low[u] = dfs_num[u] = dfsCounter++;
+    visited[u] = 1;
+    st.push(u);
+    for (int v : adj[u]) {
+        if (dfs_num[v] == -1) tarjan(v); 
+        if (visited[v]) dfs_low[u] = min(dfs_low[u], dfs_low[v]); 
+    }
+
+    if (dfs_low[u] == dfs_num[u]) {
+        scc++;
+        while (st.size()) {
+            int v = st.top(); st.pop();
+            visited[v] = 0;
+            comp[scc].push_back(v);
+            if (v == u) break;
+        }
+    }
+}
+
+void dfs(int u) {
+    visited[u] = 1;
+    for (int v : adj[u])
+        if (!visited[v])
+            dfs(v);
+}
+\end{lstlisting}
+\section{Dynamic Programming}
+\subsection{Longest Increasing Subsequence(LIS)}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n; cin >> n;
+vector<int> dp;
+for (int i = 0; i < n; i++) {
+    int x; cin >> x;
+    auto it = lower_bound(dp.begin(), dp.end(), x);
+    if (it == dp.end()) dp.push_back(x);
+    else *it = x;
+}
+cout << dp.size() << "\n";
+}
+\end{lstlisting}
+\subsection{Longest Common Subsequence(LCS)}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+string x, y; cin >> x >> y;
+int n = x.size(), m = y.size();
+int dp[n + 1][m + 1] = {};
+for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= m; j++) {
+        if (x[i - 1] == y[j - 1]) 
+            dp[i][j] = max(dp[i][j], dp[i - 1][j - 1] + 1);
+        else
+            dp[i][j] = max({dp[i][j], dp[i - 1][j], dp[i][j - 1]});
+    }
+}
+cout << dp[n][m];
+\end{lstlisting}
+\section{Data Structures}
+\subsection{Sparse table}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, q;
+int arr[MAX_N], dp[MAX_N][MAX_L];
+ 
+void build_sparse_table() {
+    for (int i = 1; i <= n; i++)
+        dp[i][0] = arr[i];
+    for (int j = 1; j < MAX_L; j++)
+        for (int i = 1; i + (1 << j) <= n + 1; i++)
+            dp[i][j] = min(dp[i][j - 1], dp[i + (1 << (j - 1))][j - 1]);
+            // dp[i][j] = dp[i][j - 1] ^ dp[i + (1 << (j - 1))][j - 1];
+}
+
+int lg(int x) {
+    return 32 - __builtin_clz(x) - 1;
+}
+
+int min_query(int l, int r) { // O(1)
+    int k = lg(r - l + 1);
+    return min(dp[l][k], dp[r - (1 << k) + 1][k]);
+}
+
+int xor_query(int l, int r) { // O(logn)
+    int k = r - l + 1, ans = 0;
+    for (int i = 0; i < MAX_L; i++) {
+        if (k & (1 << i)) {
+            ans ^= dp[l][i];
+            l += (1 << i);
+        }
+    }
+    return ans;
+}
+
+\end{lstlisting}
+\subsection{Fenwick Tree}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+#define LSOne(S) ((S) & (-S))
+
+int n, q;
+ll ft[MAX_N];
+ 
+void update(int x, int v) {
+    for (; x <= n; x += LSOne(x))
+        ft[x] += v;
+}
+ 
+ll sum(int x) {
+    ll res = 0;
+    for (; x; x -= LSOne(x)) 
+        res += ft[x];
+    return res;
+}
+ 
+ll rsq(int l, int r) {
+    return sum(r) - sum(l - 1);
+}
+
+\end{lstlisting}
+\subsection{Segment Tree}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, q, arr[MAX_N], st[4 * MAX_N];
+ 
+void build(int node, int start, int end) {
+    if (start == end) {
+        st[node] = arr[start];
+        return;
+    }
+    int mid = (start + end) / 2;
+    build(2 * node, start, mid);
+    build(2 * node + 1, mid + 1, end);
+    st[node] = min(st[2 * node], st[2 * node + 1]);
+}
+ 
+void update(int node, int start, int end, int idx, int val) {
+    if (start == end) {
+        arr[idx] = val;
+        st[node] = val;
+        return;
+    }
+    int mid = (start + end) / 2;
+    if (idx <= mid) update(2 * node, start, mid, idx, val);
+    else update(2 * node + 1, mid + 1, end, idx, val);
+    st[node] = min(st[2 * node], st[2 * node + 1]);
+}
+
+int query(int node, int start, int end, int l, int r) {
+    if (start > r || end < l) return INF;
+    if (l <= start && end <= r) return st[node];
+    int mid = (start + end) / 2;
+    return min(query(2 * node, start, mid, l, r), query(2 * node + 1, mid + 1, end, l, r)); 
+}
+\end{lstlisting}
+\subsection{Disjoint Set Union}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+int n, par[MAX_N], sz[MAX_N], num_grp;
+ 
+int find(int u) {
+    return u == par[u] ? u : par[u] = find(par[u]);
+}
+ 
+void merge(int u, int v) {
+    u = find(u), v = find(v);
+    if (u == v) return;
+    if (sz[u] > sz[v]) swap(u, v);
+    par[u] = v;
+    sz[v] += sz[u];
+    num_grp--;
+}
+\end{lstlisting}
+\section{Strings}
+\subsection{KMP}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+vector<int> prefix_func(string s) {
+    int n = s.size();
+    vector<int> f(n); 
+    for (int i = 1; i < n; i++) {
+        int j = f[i - 1];
+        while (j && s[i] != s[j]) j = f[j - 1];
+        f[i] = j + (s[i] == s[j]);
+    }
+    return f;
+}
+ 
+int cnt_occ(string s, string t) {
+    string ts = t + "#" + s;
+    int n = t.size(), m = s.size(), nm = ts.size();
+    auto f = prefix_func(ts);
+    int res = 0;
+    for (int i = n + 1; i < nm; i++) res += (f[i] == n);
+    return res;
+}
+ 
+\end{lstlisting}
+\subsection{Rabin-Karp}
+\lstset {    language=C++,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    breaklines=true,
+    tabsize=4}
+\begin{lstlisting}[linewidth=\columnwidth,breaklines=true,language=C++]
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll rand(ll l, ll r) {return uniform_int_distribution(l, r)(rng);}
+const int BASE = rand(300, 1e9);
+const int NUM_MOD = 2;
+const ll MODS[] = {(int)1e9 + 2277, (int)1e9 + 5277};
+struct Hash {
+    vector<ll> H[NUM_MOD], P[NUM_MOD];
+    Hash(string s) {
+        for (int i = 0; i < NUM_MOD; i++) {
+            P[i].push_back(1);
+            H[i].push_back(0);
+        }
+        for (char c : s) {
+            for (int i = 0; i < NUM_MOD; i++) {
+                P[i].push_back(P[i].back() * BASE % MODS[i]);
+                H[i].push_back((H[i].back() * BASE + c) % MODS[i]);
+            }
+        }
+    } 
+    ar<ll,NUM_MOD> operator()(int l, int r) {
+        ar<ll,NUM_MOD> res;
+        for (int i = 0; i < NUM_MOD; i++) {
+            res[i] = (H[i][r + 1] - H[i][l] * P[i][r + 1 - l]) % MODS[i];
+            if (res[i] < 0) res[i] += MODS[i];
+        }
+        return res;
+    }
+};
+
+int cnt_occ(string s, string t) {
+    int n = s.size(), m = t.size();
+    Hash hs(s), ht(t);
+    int res = 0;
+    for (int i = 0, j = m - 1; j < n; i++, j++) {
+        res += (hs(i, j) == ht(0, m - 1));
+    }
+    return res;
+}
+ 
+\end{lstlisting}
+\end{multicols}
+\end{document}
